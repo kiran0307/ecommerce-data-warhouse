@@ -60,8 +60,9 @@ def generate_products_data(num_products=500):
         product_name = f"Product {random.choice(categories)} {i+1}"
         category = random.choice(categories)
         brand = random.choice(brands)
-        price = round(random.uniform(5, 500), 2)
-        cost = round(price * random.uniform(0.3, 0.7), 2)
+        # FIX: Convert to float explicitly
+        price = float(round(random.uniform(5.0, 500.0), 2))
+        cost = float(round(price * random.uniform(0.3, 0.7), 2))
         
         product_data.append({
             "product_id": product_id,
@@ -70,7 +71,7 @@ def generate_products_data(num_products=500):
             "brand": brand,
             "price": price,
             "cost": cost,
-            "stock_quantity": random.randint(0, 1000),
+            "stock_quantity": int(random.randint(0, 1000)),
             "created_date": datetime(2023, 1, 1) + timedelta(days=random.randint(0, 365))
         })
     
@@ -85,7 +86,8 @@ def generate_orders_data(num_orders=5000, num_customers=1000):
         customer_id = f"CUST{random.randint(1, num_customers):06d}"
         order_date = datetime(2023, 1, 1) + timedelta(days=random.randint(0, 365))
         status = random.choice(statuses)
-        total_amount = round(random.uniform(10, 1000), 2)
+        # FIX: Convert to float explicitly
+        total_amount = float(round(random.uniform(10.0, 1000.0), 2))
         
         order_data.append({
             "order_id": order_id,
@@ -109,9 +111,11 @@ def generate_order_items_data(num_orders=5000, num_products=500):
         for item_num in range(num_items):
             item_id = f"ITEM{item_counter+1:10d}"
             product_id = f"PROD{random.randint(1, num_products):06d}"
-            quantity = random.randint(1, 10)
-            unit_price = round(random.uniform(5, 500), 2)
-            discount = round(random.uniform(0, 0.2), 2)
+            quantity = int(random.randint(1, 10))
+            # FIX: Convert to float explicitly
+            unit_price = float(round(random.uniform(5.0, 500.0), 2))
+            discount = float(round(random.uniform(0.0, 0.2), 2))
+            line_total = float(round((quantity * unit_price) * (1 - discount), 2))
             
             order_items_data.append({
                 "item_id": item_id,
@@ -120,7 +124,7 @@ def generate_order_items_data(num_orders=5000, num_products=500):
                 "quantity": quantity,
                 "unit_price": unit_price,
                 "discount": discount,
-                "line_total": round((quantity * unit_price) * (1 - discount), 2)
+                "line_total": line_total
             })
             
             item_counter += 1
@@ -147,7 +151,7 @@ print(f"✓ Generated {len(order_items)} order items")
 
 # COMMAND ----------
 
-# Create Spark DataFrames
+# Create Spark DataFrames with explicit schemas
 customers_raw = spark.createDataFrame(customers, schema=StructType([
     StructField("customer_id", StringType()),
     StructField("first_name", StringType()),
